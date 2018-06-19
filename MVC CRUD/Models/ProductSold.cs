@@ -21,7 +21,7 @@ namespace MVC_CRUD.Models
         public int ProductID { get; set; }
         public int StoreID { get; set; }
 
-        [Required(ErrorMessage = "Select Date")]
+        [Required(ErrorMessage = "Enter Date")]
         public System.DateTime Datesold { get; set; }
     
         public virtual Customer Customer { get; set; }

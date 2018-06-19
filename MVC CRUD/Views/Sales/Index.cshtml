@@ -78,8 +78,7 @@
 
                         @Html.Label("Date Sold")
                         <br />
-
-                        <input id="Datesold" type="date" class="datepicker" name="date" />
+                        @Html.TextBoxFor(model => model.Datesold, "{0:MM/dd/yyyy}", new { @class = "text-danger default-date-picker" })
                         @Html.ValidationMessageFor(model => model.Datesold, null, new { @class = "text-danger" })
                     </div>
                     <div class="modal-footer">
@@ -184,8 +183,7 @@
                             location.reload();                           
                         },
                         error: function () {
-                            location.reload(); 
-                           // alert("error");
+
                         }
                     })
                 }
@@ -199,8 +197,7 @@
                             location.reload();
                         },
                         error: function () {
-                            location.reload(); 
-                           // alert("error");
+
                         }
 
                     })
