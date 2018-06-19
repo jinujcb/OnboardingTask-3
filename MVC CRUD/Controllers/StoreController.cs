@@ -30,33 +30,24 @@ namespace MVC_CRUD.Controllers
         }
         public ActionResult Index()
         {
-            return View();
+            return View("Index");
         }
 
         [HttpPost]
-        public ActionResult Index(Store store)
+        public ActionResult Create(Store store)
         {
-
             if (ModelState.IsValid)
             {
                 db.Stores.Add(store);
                 db.SaveChanges();
+
             }
-            return View(db.Stores.ToList());
-
-        }
-
-        public ActionResult Edit(/*int id*/)
-        {
             return View();
         }
-
 
         [HttpPost]
         public ActionResult Edit(Store store)  // Update PartialView  
         {
-            // bool status = false;
-
             if (ModelState.IsValid)
             {
                 Store storenew = db.Stores.Where(X => X.ID == store.ID).FirstOrDefault();
@@ -65,34 +56,19 @@ namespace MVC_CRUD.Controllers
                     storenew.ID = store.ID;
                     storenew.Name = store.Name;
                     storenew.Address = store.Address;
+                    db.SaveChanges();
                 }
-
-
-                db.SaveChanges();
-            }
-            return RedirectToAction("Index");
-        }
-
-
-        public ActionResult Delete(int id)
-        {
-            Store storenew = db.Stores.Where(X => X.ID == id).FirstOrDefault();
-            if (storenew != null)
-            {
-                return View(storenew);
+                return RedirectToAction("Index");
             }
             else
-                return HttpNotFound();
+            return View(store);
         }
-
 
 
         [HttpPost]
         [ActionName("Delete")]
         public ActionResult DeleteEmployee(int id)  // Update PartialView  
         {
-            // bool status = false;
-
             if (ModelState.IsValid)
             {
                 Store storenew = db.Stores.Where(X => X.ID == id).FirstOrDefault();
@@ -100,7 +76,6 @@ namespace MVC_CRUD.Controllers
                 {
                     db.Stores.Remove(storenew);
                     db.SaveChanges();
-                    // status = true;
                 }
             }
             return RedirectToAction("Index");

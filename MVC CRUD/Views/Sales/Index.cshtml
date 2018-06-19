@@ -1,4 +1,4 @@
-﻿
+﻿@model MVC_CRUD.Models.ProductSold
 
 @{
     ViewBag.Title = "Index";
@@ -29,9 +29,9 @@
 
             <tr>
                 <td class="Customer Name" data-bind="text: Customer.Name"></td>
-                <td class="Product Name"  data-bind="text: Product.Name"></td>
-                <td class="Store Name"   data-bind="text: Store.Name"> </td>
-                <td class="DateSold"     data-bind="text: Datesold"></td>
+                <td class="Product Name" data-bind="text: Product.Name"></td>
+                <td class="Store Name" data-bind="text: Store.Name"> </td>
+                <td class="DateSold" data-bind="text: Datesold"></td>
                 <td>
                     <a class="btn btn-warning btn-sm " data-bind="click: edit , attr: {'id' : ID} " style="color:white; margin-left:10px"><i class="fa fa-pencil "></i> Edit</a>
                 </td>
@@ -44,114 +44,172 @@
 
     </table>
 
+    @using (Html.BeginForm())
+    {
+        <div id="Modal" class=" modal fade Modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="m_Title" style="margin-right:20px"></h3>
+                        @Html.ActionLink("x", "Index", "Sales", new { @class = "close" })
+                    </div>
 
-    <div id="Modal" class=" modal fade Modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                @Html.AntiForgeryToken()
-                <div class="modal-header">
-                    <h3 class="modal-title" id="m_Title" style="margin-right:20px"></h3>
-                    @Html.ActionLink("x", "Index", "Sales", new { @class = "close" })
-                </div>
+                    <div class="modal-body">
+                        @Html.Label("Customer Name")
+                        <br />
+                        <div id="error0"></div>
+                        <select id="Customer_Name" data-bind="options: customers, optionsText: 'Name',optionsValue: 'ID'"></select>
+                        <br /> <br />
 
-                <div class="modal-body">
-                    @Html.Label("Customer Name")
-                    <br />
-                    <div id="error0"></div>
-                    <select id="Customer_Name" data-bind="options: customers, optionsText: 'Name',optionsValue: 'ID'" ></select>
-                    <br /> <br />
-
-                    @Html.Label("Product Name")
-                    <br />
-                    <div id="error1"></div>
-                    <select id="Product_Name" data-bind="options: products, optionsText: 'Name',optionsValue: 'ID' "></select>
-                    <br /> <br />
-
-
-                    @Html.Label("Store Name")
-                    <br />
-                    <div id="error2"></div>
-                    <select id="Store_Name" data-bind="options: stores, optionsText: 'Name',optionsValue: 'ID'"></select>
-                    <br /> <br />
+                        @Html.Label("Product Name")
+                        <br />
+                        <div id="error1"></div>
+                        <select id="Product_Name" data-bind="options: products, optionsText: 'Name',optionsValue: 'ID' "></select>
+                        <br /> <br />
 
 
-                    @Html.Label("Date Sold")
-                    <br />
+                        @Html.Label("Store Name")
+                        <br />
+                        <div id="error2"></div>
+                        <select id="Store_Name" data-bind="options: stores, optionsText: 'Name',optionsValue: 'ID'"></select>
+                        <br /> <br />
 
-                    <input id="Datesold" type="date" class="datepicker" name="date" />
-                </div>
-                <div class="modal-footer">
-                    <input type="submit" value="Save" class="btn btn-primary" id="btnSubmit" />
-                    @Html.ActionLink("Close", "Index", "Sales", new { @class = "btn btn-danger" })
 
+                        @Html.Label("Date Sold")
+                        <br />
+
+                        <input id="Datesold" type="date" class="datepicker" name="date" />
+                        @Html.ValidationMessageFor(model => model.Datesold, null, new { @class = "text-danger" })
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" value="Save" class="btn btn-primary" id="btnSubmit" />
+                        @Html.ActionLink("Close", "Index", "Sales", new { @class = "btn btn-danger" })
+
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
 
-
-</body>
+    </body>
 @section scripts{
-    <script src="~/Scripts/knockout-3.4.2.js"></script>
-    <script src="~/Scripts/knockout-3.4.2.debug.js" type="text/javascript"></script>
     <script>
-
-        var viewModel = {
-            ID: ko.observable(), 
-            Name: ko.observable(), 
-            CustomerID: ko.observable(),
-            ProductID: ko.observable(),
-            StoreID: ko.observable(),
-            Datesold: ko.observable(),
-            customers: ko.observableArray(),
-            products: ko.observableArray(),
-            stores: ko.observableArray(),
-            sales: ko.observableArray(),
-
-        };
-
         $(document).ready(function () {
-            var newData;
+
+        ko.validation.init({
+            registerExtenders: true,
+            messagesOnModified: true,
+            insertMessages: true,
+            parseInputAttributes: true,
+            messageTemplate: null,
+            errorClass: 'text-danger'
+        }, true);
+
+            function viewModel()
+            {
+            var self = this;
+
+            self.ID = ko.observable();
+            self.Name = ko.observable();
+            self.CustomerID = ko.observable();
+            self.ProductID = ko.observable();
+            self.StoreID = ko.observable();
+            self.Datesold = ko.observable();
+            self.customers = ko.observableArray([]);
+            self.products = ko.observableArray([]);
+            self.stores = ko.observableArray([]);
+            self.sales = ko.observableArray([])
+
+            var viewModelvalidate1 = ko.validatedObservable([
+                self.Datesold = ko.observable().extend({ required: { message: '*' } }),
+            ]);//validate object of viewmodel....cannot make two different models and bind hence following this method
+
+           
             $.ajax({
                 type: "GET",
                 url: "/Sales/GetAllSales",
-                success: function (data) {                 
+                success: function (data) {
                     var jsondata = JSON.parse(data);//to change serialised data format
                     for (var item in jsondata) {
                         jsondata[item].Datesold = moment(jsondata[item].Datesold).format('L');//change date format
                     }
-                    viewModel.sales(jsondata); //Put the response in ObservableArray
-                    ko.applyBindings(viewModel);
+                    self.sales(jsondata); //Put the response in ObservableArray
+                  
                 }
             })
             $.ajax({
                 type: "GET",
                 url: "/Customer/GetAllCustomers",
                 success: function (data) {
-                    viewModel.customers(data); //Put the response in ObservableArray
-                    // alert("sucess")
-                  //  ko.applyBindings(viewModel);
+                    self.customers(data); //Put the response in ObservableArray
                 }
             })
-            
+
             $.ajax({
                 type: "GET",
                 url: "/Products/GetAllProducts",
                 success: function (data) {
-                    viewModel.products(data); //Put the response in ObservableArray
-                    // alert("sucess")
-                    // ko.applyBindings(viewModel);
+                    self.products(data); //Put the response in ObservableArray
                 }
             });
             $.ajax({
                 type: "GET",
                 url: "/Store/GetAllStores",
                 success: function (data) {
-                    viewModel.stores(data); //Put the response in ObservableArray
-                    // alert("sucess")
-                   // ko.applyBindings(viewModel);
+                    self.stores(data); //Put the response in ObservableArray
                 }
             })
+
+            $("#btnSubmit").on("click", function (ev) {
+                var current = {
+                    CustomerID: $("#Customer_Name").val(),
+                    ProductID: $("#Product_Name").val(),
+                    StoreID: $("#Store_Name").val(),
+                    Datesold: $("#Datesold").val(),
+                }
+
+                if (current.Datesold === '') {
+                    viewModelvalidate1.errors.showAllMessages();
+                }
+              
+
+                if ($('#m_Title').text() === "Create Record") {
+
+                    $.ajax({
+                        url: '/Sales/Create',
+                        method: 'POST',
+                        data: { CustomerID: current.CustomerID, ProductID: current.ProductID, StoreID: current.StoreID, Datesold: current.Datesold },
+                        success: function () {
+                            location.reload();                           
+                        },
+                        error: function () {
+                            location.reload(); 
+                           // alert("error");
+                        }
+                    })
+                }
+                else if ($('#m_Title').text() === "Edit Record") {
+
+                    $.ajax({
+                        url: '/Sales/Edit',
+                        method: 'POST',
+                        data: { ID: Id, CustomerID: current.CustomerID, ProductID: current.ProductID, StoreID: current.StoreID, Datesold: current.Datesold },
+                        success: function () {
+                            location.reload();
+                        },
+                        error: function () {
+                            location.reload(); 
+                           // alert("error");
+                        }
+
+                    })
+                }
+
+            });//in order to check validation submit is added inside viewmodel
+
+        }
+      
             self.create = function () {
                 $('#Modal').modal({ show: true });
                 $('#m_Title').text("Create Record");
@@ -185,8 +243,7 @@
                     url: '/Sales/GetSale',
                     method: 'GET',
                     data: { ID: Id },
-                    success: function (data) {
-                       
+                    success: function (data) {                
                         return true;
                     },
 
@@ -206,7 +263,6 @@
                                 return true;
                             },
                             error: function () {
-
                                 location.reload();
                             }
 
@@ -220,51 +276,8 @@
                 
 
             };
-            $(document).on("click", "#btnSubmit", null, function (ev) {
-
-                var current = {
-                    CustomerID: $("#Customer_Name").val(),
-                    ProductID: $("#Product_Name").val(),
-                    StoreID: $("#Store_Name").val(),
-                    Datesold: $("#Datesold").val(),
-                }
-
-                if ($('#m_Title').text() === "Create Record") {
-                   
-                    $.ajax({
-                        url: '/Sales/Index',
-                        method: 'POST',
-                        data: { CustomerID: current.CustomerID, ProductID: current.ProductID, StoreID: current.StoreID, Datesold: current.Datesold },
-                        success: function () {
-                           
-                            location.reload();
-                            return true;
-                        },
-                        error: function () {
-                            alert("error");
-                            location.reload();
-                        }
-                    })
-                }
-                else if ($('#m_Title').text() === "Edit Record") {
-
-                    $.ajax({
-                        url: '/Sales/Edit',
-                        method: 'POST',      
-                        data: { ID: Id, CustomerID: current.CustomerID, ProductID: current.ProductID, StoreID: current.StoreID, Datesold: current.Datesold },
-                        success: function () {
-                            location.reload();
-                            return true;
-                        },
-                        error: function () {
-
-                            location.reload();
-                        }
-
-                    })
-                }
-  
-            }); 
+            ko.applyBindings(new viewModel());
+         
         });//document
      
 

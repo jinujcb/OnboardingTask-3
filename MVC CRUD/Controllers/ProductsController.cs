@@ -27,83 +27,50 @@ namespace MVC_CRUD.Controllers
             Product productnew = db.Products.Find(id);
 
             return Json(productnew, JsonRequestBehavior.AllowGet);
-            //return View(productnew); 
-
         }
 
 
         public ActionResult Index()
         {
-            return View();
-           
+            return View("Index");
         }
-    
-        
-        [HttpPost]
-        //[ValidateAntiForgeryToken]
+   
         public ActionResult Create(Product product)
         {
             if (ModelState.IsValid)
             {
                 db.Products.Add(product);
                 db.SaveChanges();
-
-                
             }
-
-            return View(product);
-        }
-
-
-
-        public ActionResult Edit(/*int id*/)
-        {
             return View();
         }
-
-
 
         [HttpPost]
         public ActionResult Edit(Product product)  // Update PartialView  
         {
-
             if (ModelState.IsValid)
             {
+
                 Product productnew = db.Products.Where(X => X.ID == product.ID).FirstOrDefault();
                 if (productnew != null)
                 {
                     productnew.ID = product.ID;
                     productnew.Name = product.Name;
                     productnew.Price = product.Price;
+                    db.SaveChanges();
                 }
-
-                db.SaveChanges();
-            }
-            return View(product);
-
-
-        }
-
-
-        public ActionResult Delete(int id)
-        {
-            Product productnew = db.Products.Where(X => X.ID == id).FirstOrDefault();
-            if (productnew != null)
-            {
-                return View(productnew);
+                return RedirectToAction("Index");
             }
             else
-                return HttpNotFound();
+                return View(product);
+
+
         }
-
-
 
         [HttpPost]
         [ActionName("Delete")]
         public ActionResult DeleteEmployee(int id)  // Update PartialView  
         {
-            // bool status = false;
-
             if (ModelState.IsValid)
             {
                 Product productnew = db.Products.Where(X => X.ID == id).FirstOrDefault();
@@ -111,7 +78,6 @@ namespace MVC_CRUD.Controllers
                 {
                     db.Products.Remove(productnew);
                     db.SaveChanges();
-                    // status = true;
                 }
             }
             return RedirectToAction("Index");

@@ -21,9 +21,9 @@ namespace MVC_CRUD.Models
         {
             this.ProductSolds = new HashSet<ProductSold>();
         }
-    
+
         public int ID { get; set; }
-        [DisplayName(" Name")]
+       
         [Required(ErrorMessage = "Customer Name is required")]
         [StringLength(100, MinimumLength = 3)]
         public string Name { get; set; }

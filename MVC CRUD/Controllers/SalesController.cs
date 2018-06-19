@@ -21,9 +21,7 @@ namespace MVC_CRUD.Controllers
             db.Configuration.ProxyCreationEnabled = false;
        
             List<ProductSold> salelist = db.ProductSolds.Include(c => c.Customer).Include(c => c.Product).Include(c => c.Store).ToList();
-            //var deserializedProduct = JsonConvert.DeserializeObject<IEnumerable<ProductSold>>();
-
-           var product = JsonConvert.SerializeObject(salelist, Formatting.Indented,
+            var product = JsonConvert.SerializeObject(salelist, Formatting.Indented,
             new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -41,32 +39,25 @@ namespace MVC_CRUD.Controllers
         }
 
         public ActionResult Index()
-        {        
-            return View();
+        {
+            return View("Index");
         }
 
         [HttpPost]
-        public ActionResult Index(ProductSold product)
+        public ActionResult Create(ProductSold product)
         {
-
             if (ModelState.IsValid)
             {
                 db.ProductSolds.Add(product);
                 db.SaveChanges();
+                
             }
-            return RedirectToAction("Index");
-        }
-
-        public ActionResult Edit(/*int id*/)
-        {
             return View();
         }
 
         [HttpPost]
-
         public ActionResult Edit(ProductSold product)  // Update PartialView  
         {
-
             if (ModelState.IsValid)
             {
                 ProductSold productnew = db.ProductSolds.Where(X => X.ID == product.ID).FirstOrDefault();
@@ -77,33 +68,18 @@ namespace MVC_CRUD.Controllers
                     productnew.StoreID = product.StoreID;
                     productnew.Datesold = product.Datesold;
                     db.SaveChanges();
-                    // status = true;
                 }
-
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
+            else
+                return View(product);
         }
-
-
-        public ActionResult Delete(int id)
-        {
-            ProductSold productnew = db.ProductSolds.Where(X => X.ID == id).FirstOrDefault();
-            if (productnew == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(productnew);
-        }
-
 
 
         [HttpPost]
         [ActionName("Delete")]
         public ActionResult DeleteEmployee(int id)  // Update PartialView  
         {
-            // bool status = false;
-
             if (ModelState.IsValid)
             {
                 ProductSold productnew = db.ProductSolds.Where(X => X.ID == id).FirstOrDefault();
@@ -111,11 +87,9 @@ namespace MVC_CRUD.Controllers
                 {
                     db.ProductSolds.Remove(productnew);
                     db.SaveChanges();
-                    // status = true;
                 }
             }
             return RedirectToAction("Index");
-
         }
     }
 }

@@ -23,12 +23,12 @@ namespace MVC_CRUD.Models
         }
     
         public int ID { get; set; }
-        [DisplayName("Name")]
+      
         [Required(ErrorMessage = "Product Name is required")]
         [StringLength(100, MinimumLength = 3)]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Price is required")]
+        [Required(ErrorMessage = "Product Price is required")]
         [Range(1, 10000000, ErrorMessage = "Price must be between 1 and 10000000")]
         public string Price { get; set; }
 

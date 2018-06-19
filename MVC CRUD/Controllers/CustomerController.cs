@@ -31,65 +31,43 @@ namespace MVC_CRUD.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            return View("Index");
         }
 
         [HttpPost]
-        public ActionResult Index(Customer customer)
+        public ActionResult Create(Customer customer)
         {
             if (ModelState.IsValid)
             {
                 db.Customers.Add(customer);
                 db.SaveChanges();
             }
-            return View(db.Customers.ToList());
-        }
-
-        public ActionResult Edit(/*int id*/)
-        {
             return View();
         }
-
-
 
         [HttpPost]
         public ActionResult Edit(Customer customer)  // Update PartialView  
         {
-                Customer customernew = db.Customers.Where(X => X.ID == customer.ID).FirstOrDefault();
-
             if (ModelState.IsValid)
             {
+                Customer customernew = db.Customers.Where(X => X.ID == customer.ID).FirstOrDefault();
                 if (customernew != null)
                 {
                     customernew.ID = customer.ID;
                     customernew.Name = customer.Name;
                     customernew.Address = customer.Address;
+                    db.SaveChanges();
                 }
-                db.SaveChanges();
-            }
-            return View(customernew);
-
-        }
-
-
-        public ActionResult Delete(int id)
-        {
-            Customer customernew = db.Customers.Where(X => X.ID == id).FirstOrDefault();
-            if (customernew != null)
-            {
-                return View(customernew);
+                return RedirectToAction("Index");
             }
             else
-                return HttpNotFound();
+            return View(customer);
         }
-
-
 
         [HttpPost]
         [ActionName("Delete")]
         public ActionResult DeleteEmployee(int id)  // Update PartialView  
         {
-            // bool status = false;
             if (ModelState.IsValid)
             {
                 Customer customer = db.Customers.Where(X => X.ID == id).FirstOrDefault();
@@ -97,11 +75,9 @@ namespace MVC_CRUD.Controllers
                 {
                     db.Customers.Remove(customer);
                     db.SaveChanges();
-                    // status = true;
                 }
             }
-            return RedirectToAction("Index");
-
+            return View("Index");
         }
 
     }

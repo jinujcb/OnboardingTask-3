@@ -23,7 +23,7 @@ namespace MVC_CRUD.Models
         }
     
         public int ID { get; set; }
-        [DisplayName("Name")]
+        
         [Required(ErrorMessage = "Store Name is required")]
         [StringLength(100, MinimumLength = 3)]
         public string Name { get; set; }
